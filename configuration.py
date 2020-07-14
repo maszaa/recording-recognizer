@@ -2,7 +2,7 @@ from datetime import datetime
 
 ARCCLOUD_CONFIGURATION = {}
 
-SAMPLE_RATE = 44100
+SAMPLE_RATE = 48000
 DURATION = 30
 CHANNELS = 1
 
