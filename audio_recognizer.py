@@ -41,10 +41,14 @@ class AudioRecognizer:
 
     metadata = result.get("metadata", {}).get("music", [{}])[0]
 
+    if "metadata" in result:
+      del result["metadata"]
+
     return {
       "artist": metadata.get("artists", [{}])[0].get("name"),
       "album": metadata.get("album", {}).get("name"),
-      "title": metadata.get("title")
+      "title": metadata.get("title"),
+      "__info": result
     }
 
   def record_and_recognize(self):
