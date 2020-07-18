@@ -28,15 +28,20 @@ class AudioRecognizer:
     wavfile.write(self.filename, self.sample_rate, recording)
 
   def normalize(self):
-    rawsound = AudioSegment.from_file(self.filename, self.audio_format)
-    normalizedsound = effects.normalize(rawsound)
-    normalizedsound.export(self.filename, format=self.audio_format)
+    raw_sound = AudioSegment.from_file(self.filename, self.audio_format)
+    normalized_sound = effects.normalize(raw_sound)
+    normalized_sound.export(self.filename, format=self.audio_format)
 
   def delete_recording(self):
     os.remove(self.filename)
 
   def recognize(self):
-    result = json.loads(self.recognizer.recognize_by_file(self.filename, self.recognizer_start_offset))
+    result = json.loads(
+      self.recognizer.recognize_by_file(
+        self.filename,
+        self.recognizer_start_offset
+      )
+    )
     pprint.pprint(result)
 
     metadata = result.get("metadata", {}).get("music", [{}])[0]
@@ -53,12 +58,16 @@ class AudioRecognizer:
 
   def record_and_recognize(self):
     result = {}
+
     try:
       self.record()
       self.normalize()
       result = self.recognize()
       self.delete_recording()
     except Exception as e:
-      print(e)
+      pprint.pprint(e)
+      result = {
+        "error": str(e)
+      }
 
     return result

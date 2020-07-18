@@ -10,7 +10,7 @@ AUDIO_FILEPATH = "/tmp"
 AUDIO_FORMAT = "wav"
 
 def GET_AUDIO_FILENAME():
-  return f"{AUDIO_FILEPATH}/{datetime.now().microsecond}"
+  return f"{AUDIO_FILEPATH}/{datetime.now().microsecond}.{AUDIO_FORMAT}"
 
 try:
   from local_configuration import *
