@@ -1,4 +1,4 @@
-from datetime import datetime
+import time
 
 ARCCLOUD_CONFIGURATION = {}
 
@@ -10,7 +10,7 @@ AUDIO_FILEPATH = "/tmp"
 AUDIO_FORMAT = "wav"
 
 def GET_AUDIO_FILENAME():
-  return f"{AUDIO_FILEPATH}/{datetime.now().microsecond}.{AUDIO_FORMAT}"
+  return f"{AUDIO_FILEPATH}/{time.time_ns()}.{AUDIO_FORMAT}"
 
 try:
   from local_configuration import *
