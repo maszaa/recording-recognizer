@@ -17,7 +17,7 @@ def get_app():
       configuration.AUDIO_FORMAT,
       configuration.HIGH_PASS_FREQUENCY,
       configuration.HIGH_PASS_ORDER,
-      configuration.ARCCLOUD_CONFIGURATION,
+      configuration.ACRCLOUD_CONFIGURATION,
       configuration.ACRCLOUD_RESULT_SCORE_THRESHOLD,
       noise_audio_filepath=configuration.NOISE_AUDIO_FILEPATH
     )
