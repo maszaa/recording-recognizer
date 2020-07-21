@@ -93,7 +93,8 @@ class AudioRecognizer:
     result = json.loads(
       self.recognizer.recognize_by_file(
         self.filename,
-        self.recognizer_start_offset
+        self.recognizer_start_offset,
+        rec_length=self.duration
       )
     )
     pprint.pprint(result)
