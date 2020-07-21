@@ -24,6 +24,7 @@ class AudioRecognizer:
     high_pass_frequency,
     high_pass_order,
     acrcloud_config,
+    acrcloud_result_score_threshold,
     recognizer_start_offset=0,
     noise_audio_filepath=None
   ):
@@ -35,6 +36,7 @@ class AudioRecognizer:
     self.high_pass_frequency = high_pass_frequency
     self.high_pass_order = high_pass_order
     self.recognizer = ACRCloudRecognizer(acrcloud_config)
+    self.acrcloud_result_score_threshold = acrcloud_result_score_threshold
     self.recognizer_start_offset = recognizer_start_offset
     self.noise_audio_filepath = noise_audio_filepath
 
@@ -98,7 +100,9 @@ class AudioRecognizer:
 
     metadata = result.get("metadata", {}).get("music", [{}])[0]
 
-    if "metadata" in result:
+    if metadata.get("score", 0) < self.acrcloud_result_score_threshold:
+      metadata = {}
+    else:
       del result["metadata"]
 
     self._log_action(self.recognize.__name__, ready=True)

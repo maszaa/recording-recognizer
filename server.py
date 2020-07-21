@@ -18,6 +18,7 @@ def get_app():
       configuration.HIGH_PASS_FREQUENCY,
       configuration.HIGH_PASS_ORDER,
       configuration.ARCCLOUD_CONFIGURATION,
+      configuration.ACRCLOUD_RESULT_SCORE_THRESHOLD,
       noise_audio_filepath=configuration.NOISE_AUDIO_FILEPATH
     )
     return recognizer.record_and_recognize()
