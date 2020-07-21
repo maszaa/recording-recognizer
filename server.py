@@ -15,7 +15,10 @@ def get_app():
       configuration.CHANNELS,
       configuration.GET_AUDIO_FILENAME(),
       configuration.AUDIO_FORMAT,
-      configuration.ARCCLOUD_CONFIGURATION
+      configuration.HIGH_PASS_FREQUENCY,
+      configuration.HIGH_PASS_ORDER,
+      configuration.ARCCLOUD_CONFIGURATION,
+      noise_audio_filepath=configuration.NOISE_AUDIO_FILEPATH
     )
     return recognizer.record_and_recognize()
 

@@ -4,6 +4,9 @@ import os
 import pprint
 import traceback
 
+import noisereduce
+import numpy
+import pydub.scipy_effects
 import sounddevice
 
 from acrcloud.recognizer import ACRCloudRecognizer
@@ -11,14 +14,29 @@ from pydub import AudioSegment, effects
 from scipy.io import wavfile
 
 class AudioRecognizer:
-  def __init__(self, sample_rate, duration, channels, filename, audio_format, acrcloud_config, recognizer_start_offset=0):
+  def __init__(
+    self,
+    sample_rate,
+    duration,
+    channels,
+    filename,
+    audio_format,
+    high_pass_frequency,
+    high_pass_order,
+    acrcloud_config,
+    recognizer_start_offset=0,
+    noise_audio_filepath=None
+  ):
     self.sample_rate = sample_rate
     self.duration = duration
     self.channels = channels
     self.filename = filename
     self.audio_format = audio_format
+    self.high_pass_frequency = high_pass_frequency
+    self.high_pass_order = high_pass_order
     self.recognizer = ACRCloudRecognizer(acrcloud_config)
     self.recognizer_start_offset = recognizer_start_offset
+    self.noise_audio_filepath = noise_audio_filepath
 
   def _log_action(self, action, ready=False):
     print(f"[{datetime.datetime.now()}] {self.filename}: {action} - {'ready' if ready else 'started'}")
@@ -40,6 +58,28 @@ class AudioRecognizer:
     normalized_sound = effects.normalize(raw_sound)
     normalized_sound.export(self.filename, format=self.audio_format)
     self._log_action(self.normalize.__name__, ready=True)
+
+  def high_pass_filter(self):
+    self._log_action(self.high_pass_filter.__name__)
+    raw_sound = AudioSegment.from_file(self.filename, self.audio_format)
+    high_passed_sound = raw_sound.high_pass_filter(
+      self.high_pass_frequency,
+      order=self.high_pass_order
+    )
+    high_passed_sound.export(self.filename, format=self.audio_format)
+    self._log_action(self.high_pass_filter.__name__, ready=True)
+
+  def denoise(self):
+    if self.noise_audio_filepath:
+      self._log_action(self.denoise.__name__)
+      fs, original_sound = wavfile.read(self.filename)
+      fs, noisy_sound = wavfile.read(self.noise_audio_filepath)
+      denoised_sound = noisereduce.reduce_noise(
+        audio_clip=original_sound,
+        noise_clip=noisy_sound
+      )
+      wavfile.write(self.filename, self.sample_rate, numpy.asarray(denoised_sound, dtype=numpy.float32))
+      self._log_action(self.denoise.__name__, ready=True)
 
   def delete_recording(self):
     self._log_action(self.delete_recording.__name__)
@@ -76,6 +116,8 @@ class AudioRecognizer:
 
     try:
       self.record()
+      self.denoise()
+      self.high_pass_filter()
       self.normalize()
       result = self.recognize()
       self.delete_recording()
