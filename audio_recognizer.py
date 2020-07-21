@@ -1,6 +1,7 @@
 import json
 import os
 import pprint
+import traceback
 
 import sounddevice
 
@@ -65,7 +66,7 @@ class AudioRecognizer:
       result = self.recognize()
       self.delete_recording()
     except Exception as e:
-      pprint.pprint(e)
+      traceback.print_exc()
       result = {
         "error": str(e)
       }
