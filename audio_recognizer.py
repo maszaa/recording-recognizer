@@ -26,7 +26,8 @@ class AudioRecognizer:
     acrcloud_config,
     acrcloud_result_score_threshold,
     recognizer_start_offset=0,
-    noise_audio_filepath=None
+    noise_audio_filepath=None,
+    additional_operations=None
   ):
     self.sample_rate = sample_rate
     self.duration = duration
@@ -39,6 +40,10 @@ class AudioRecognizer:
     self.acrcloud_result_score_threshold = acrcloud_result_score_threshold
     self.recognizer_start_offset = recognizer_start_offset
     self.noise_audio_filepath = noise_audio_filepath
+
+    if not additional_operations:
+      additional_operations = []
+    self.additional_operations = additional_operations
 
   def _log_action(self, action, ready=False):
     print(f"[{datetime.datetime.now()}] {self.filename}: {action} - {'ready' if ready else 'started'}")
@@ -125,6 +130,10 @@ class AudioRecognizer:
       self.high_pass_filter()
       self.normalize()
       result = self.recognize()
+
+      for additional_operation in self.additional_operations:
+        additional_operation(self, result)
+
       self.delete_recording()
     except Exception as e:
       traceback.print_exc()

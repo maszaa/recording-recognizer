@@ -18,6 +18,8 @@ HIGH_PASS_ORDER = 30/6 # 30 dB / octave
 def GET_AUDIO_FILENAME():
   return f"{AUDIO_FILEPATH}/{time.time_ns()}.{AUDIO_FORMAT}"
 
+ADDITIONAL_OPERATIONS = []
+
 try:
   from local_configuration import *
 except ModuleNotFoundError:
