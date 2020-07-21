@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import pprint
@@ -19,7 +20,11 @@ class AudioRecognizer:
     self.recognizer = ACRCloudRecognizer(acrcloud_config)
     self.recognizer_start_offset = recognizer_start_offset
 
+  def _log_action(self, action, ready=False):
+    print(f"[{datetime.datetime.now()}] {self.filename}: {action} - {'ready' if ready else 'started'}")
+
   def record(self):
+    self._log_action(self.record.__name__)
     recording = sounddevice.rec(
       int(self.duration * self.sample_rate),
       samplerate=self.sample_rate,
@@ -27,16 +32,22 @@ class AudioRecognizer:
     )
     sounddevice.wait()
     wavfile.write(self.filename, self.sample_rate, recording)
+    self._log_action(self.record.__name__, ready=True)
 
   def normalize(self):
+    self._log_action(self.normalize.__name__)
     raw_sound = AudioSegment.from_file(self.filename, self.audio_format)
     normalized_sound = effects.normalize(raw_sound)
     normalized_sound.export(self.filename, format=self.audio_format)
+    self._log_action(self.normalize.__name__, ready=True)
 
   def delete_recording(self):
+    self._log_action(self.delete_recording.__name__)
     os.remove(self.filename)
+    self._log_action(self.delete_recording.__name__, ready=True)
 
   def recognize(self):
+    self._log_action(self.recognize.__name__)
     result = json.loads(
       self.recognizer.recognize_by_file(
         self.filename,
@@ -50,6 +61,8 @@ class AudioRecognizer:
     if "metadata" in result:
       del result["metadata"]
 
+    self._log_action(self.recognize.__name__, ready=True)
+
     return {
       "artist": metadata.get("artists", [{}])[0].get("name"),
       "album": metadata.get("album", {}).get("name"),
@@ -58,6 +71,7 @@ class AudioRecognizer:
     }
 
   def record_and_recognize(self):
+    self._log_action(self.record_and_recognize.__name__)
     result = {}
 
     try:
@@ -71,4 +85,5 @@ class AudioRecognizer:
         "error": str(e)
       }
 
+    self._log_action(self.record_and_recognize.__name__, ready=True)
     return result
